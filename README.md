@@ -3,6 +3,9 @@
 TabCultist is an application written in Rust for displaying guitar or bass tabs. 
 
 # Usage
+- next song: up arrow
+- previous song: down arrow
+
 # Instalation
 # Examples
 
