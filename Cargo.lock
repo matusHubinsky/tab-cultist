@@ -56,7 +56,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tab_cultist"
+name = "tab-cultist"
 version = "0.1.0"
 dependencies = [
  "json",
