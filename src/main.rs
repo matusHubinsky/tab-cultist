@@ -35,21 +35,20 @@ fn main() -> Result<(), String> {
 
     // album.index = (album.index + 1) % album.songs.len();
     let mut song = Song::new();
-    Song::load(Database::next(&mut database), &mut song);
+    Song::load(Database::next(&mut database), &mut song)?;
     
     let mut window = Window::new();
 
     // Initialize SDL2
-    let sdl_context = sdl2::init().unwrap();
-    let video_subsystem = sdl_context.video().unwrap();
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
 
     // Initialize Font
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?; 
-    // let font_path: &Path = Path::new(&"./font/VT323/VT323-Regular.ttf");
     let font_path: &Path = Path::new(&"./font/Roboto_Mono/RobotoMono-VariableFont_wght.ttf");
     let font_big = ttf_context.load_font(font_path, 128)?;
-    let font_small = ttf_context.load_font(font_path, 32)?;
-    // font.set_style(sdl2::ttf::FontStyle::BOLD);
+    // let font_medium = ttf_context.load_font(font_path, 32)?;
+    let font_small = ttf_context.load_font(font_path, 16)?;
 
     // Create a window
     let sdl_window = video_subsystem
@@ -71,10 +70,9 @@ fn main() -> Result<(), String> {
 
     let mut runner = Runner::new();
     let mut i = 0;
-    let shift = 24;
 
     // Main event loop
-    let mut event_pump = sdl_context.event_pump().unwrap();
+    let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
         
         let frame_start_time = Instant::now();
@@ -91,9 +89,9 @@ fn main() -> Result<(), String> {
                     fullscreen = !fullscreen;
                     // Set fullscreen mode
                     if fullscreen {
-                        canvas.window_mut().set_fullscreen(FullscreenType::Desktop).unwrap();
+                        canvas.window_mut().set_fullscreen(FullscreenType::Desktop)?;
                     } else {
-                        canvas.window_mut().set_fullscreen(FullscreenType::Off).unwrap();
+                        canvas.window_mut().set_fullscreen(FullscreenType::Off)?;
                     }
                 }
                 Event::KeyDown { keycode: Some(Keycode::P), .. } => {
@@ -145,30 +143,14 @@ fn main() -> Result<(), String> {
 
         let elapsed_frame_time = frame_start_time.elapsed();
         if elapsed_frame_time < Duration::from_secs_f32(constants::FRAME_TIME) {
-            let mouse_state: MouseState = event_pump.mouse_state();
-            window.mouse_x = mouse_state.x() as u32;
-            window.mouse_y = mouse_state.y() as u32;
             graphics::render(&mut canvas, &mut tex_man, &texture_creator, &font_big, &font_small, &mut song, &mut window, &runner)?;
             std::thread::sleep(Duration::from_secs_f32(constants::FRAME_TIME) - elapsed_frame_time / 2);
-                        
-            if runner.play {
-                match song.tabs.notes.chars().nth(i) {
-                    None => runner.play = false,
-                    Some('1') => runner.x += shift,
-                    Some('2') => runner.x += shift / 2,
-                    Some('4') => runner.x += shift / 4,
-                    Some('8') => runner.x += shift / 8,
-                    Some('-') => runner.x += shift,
-                    Some('|') => runner.x += 0,
-                    _ => println!("Error: Wrong value {} at Song tabs!", song.tabs.notes.chars().nth(i).unwrap()),
-                }             
-                i += 1;
-                
-                if runner.x > window.width as i32 { 
-                    runner.y += 175;
-                    runner.x = 60;
-                }
-            }
+        
+            window.mouse_x = event_pump.mouse_state().x() as u32;
+            window.mouse_y = event_pump.mouse_state().y() as u32;
+
+            runner = Runner::play(runner, &mut song, &mut window, i); 
+            i += 1;
         }
     }
 

@@ -12,6 +12,7 @@ pub struct Window {
     pub mouse_y: u32,
 }
 
+
 impl Window {
     pub fn new() -> Window {
         Window {
@@ -73,7 +74,6 @@ impl Song {
         }
     }
 
-
     pub fn load(file: String, song: &mut Song) -> Result<(), String> {
         let mut file = File::open(file).expect("Failed to open file");
         let mut contents = String::new();
@@ -110,7 +110,6 @@ impl Song {
         return Ok(());
     }
     
-
     pub fn print(song: Song) -> Result<(), String> {
         println!("Title: {}", song.title);
         println!("Artist: {}", song.artist);
@@ -135,6 +134,7 @@ pub struct Album {
     pub index: usize,
 }
 
+
 impl Album {
     pub fn new(path: String) -> Self {
         Self {
@@ -143,7 +143,6 @@ impl Album {
             index: 0,
         }
     }
-
 
     pub fn load(path: String) -> Vec<Song> {
         let mut songs = Vec::new();
@@ -257,6 +256,7 @@ pub struct Runner {
     pub show: bool,
 }
 
+
 impl Runner {
     pub fn new() -> Self {
         Self {
@@ -266,4 +266,28 @@ impl Runner {
             show: false,
         }
     }
+
+
+    pub fn play(mut self, song: &mut Song, window: &mut Window, i: usize) -> Self {
+        let shift = 24;
+    
+        match song.tabs.notes.chars().nth(i) {
+            None => self.play = false,
+            Some('-') | Some('1') => self.x += shift,
+            Some('2') => self.x += shift / 2,
+            Some('4') => self.x += shift / 4,
+            Some('8') => self.x += shift / 8,
+            Some('9') => self.x += shift / 16,
+            Some('|') => self.x += 0,
+            _ => println!("Error: Wrong value {} at Song tabs!", song.tabs.notes.chars().nth(i).unwrap()),
+        }
+
+        if self.x > window.width as i32 { 
+            self.y += 175;
+            self.x = 60;
+        }
+        
+        return self;
+    }
 }
+
