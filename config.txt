@@ -1,0 +1,27 @@
+
+[general]
+name = "tab-cultist"
+version = 0.1.0
+
+[window]
+title = "tab-cultist"
+width = 1920
+height = 1080
+fullscreen = false
+
+[theme]
+font = Roboto_Mono
+location = ./font/Roboto_Mono/RobotoMono-VariableFont_wght.ttf
+font_small_size = 12
+font_medium_size = 32
+font_big_size = 128
+
+[song]
+lines = 8
+note_size = 2
+
+[keyboard]
+next_song = "right arrow key"
+previous_song = "left arrow key" 
+toggle_fullscreen = "f"
+close = "esc"

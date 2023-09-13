@@ -4,20 +4,24 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use crate::Settings;
+
 
 pub struct Window {
     pub width: u32,
     pub height: u32,
+    pub fullscreen: bool,
     pub mouse_x: u32,
     pub mouse_y: u32,
 }
 
 
 impl Window {
-    pub fn new() -> Window {
+    pub fn new(settings: &Settings) -> Window {
         Window {
-            width: 1920,
-            height: 1080,
+            width: settings.width,
+            height: settings.height,
+            fullscreen: settings.fullscreen,
             mouse_x: 0,
             mouse_y: 0,
         }

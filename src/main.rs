@@ -11,12 +11,14 @@ use std::env;
 pub mod graphics;
 pub mod texture;
 pub mod data;
+pub mod settings;
 
 use crate::data::Song;
 use crate::data::Album;
 use crate::data::Window;
 use crate::data::Database;
 use crate::data::Runner;
+use crate::settings::Settings;
 
 mod constants {
     pub const FRAME_TIME: f32 = 0.02;
@@ -37,7 +39,10 @@ fn main() -> Result<(), String> {
     let mut song = Song::new();
     Song::load(Database::next(&mut database), &mut song)?;
     
-    let mut window = Window::new();
+    // Load settings
+    let settings = Settings::load().unwrap();
+
+    let mut window = Window::new(&settings);
 
     // Initialize SDL2
     let sdl_context = sdl2::init()?;
@@ -45,10 +50,10 @@ fn main() -> Result<(), String> {
 
     // Initialize Font
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?; 
-    let font_path: &Path = Path::new(&"./font/Roboto_Mono/RobotoMono-VariableFont_wght.ttf");
-    let font_big = ttf_context.load_font(font_path, 128)?;
+    let font_path: &Path = Path::new(&settings.location);
+    let font_big = ttf_context.load_font(font_path, settings.font_big_size as u16)?;
     // let font_medium = ttf_context.load_font(font_path, 32)?;
-    let font_small = ttf_context.load_font(font_path, 16)?;
+    let font_small = ttf_context.load_font(font_path, settings.font_big_size as u16)?;
 
     // Create a window
     let sdl_window = video_subsystem
@@ -65,8 +70,6 @@ fn main() -> Result<(), String> {
     // Initializa Texture Creator
     let texture_creator = canvas.texture_creator();
     let mut tex_man = texture::TextureManager::new(&texture_creator);
-
-    let mut fullscreen = false;
 
     let mut runner = Runner::new();
     let mut i = 0;
@@ -86,9 +89,9 @@ fn main() -> Result<(), String> {
                 }
                 Event::KeyDown { keycode: Some(Keycode::F), .. } => {
                     // Toggle fullscreen
-                    fullscreen = !fullscreen;
+                    window.fullscreen = !window.fullscreen;
                     // Set fullscreen mode
-                    if fullscreen {
+                    if window.fullscreen {
                         canvas.window_mut().set_fullscreen(FullscreenType::Desktop)?;
                     } else {
                         canvas.window_mut().set_fullscreen(FullscreenType::Off)?;
