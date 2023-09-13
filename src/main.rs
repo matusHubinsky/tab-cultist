@@ -25,6 +25,9 @@ mod constants {
 }
 
 
+//TODO: pub fn sdl_init()
+//TODO: event parser
+
 fn main() -> Result<(), String> {
     println!("Hail Satan!");
     if let Ok(current_dir) = env::current_dir() {
@@ -33,7 +36,7 @@ fn main() -> Result<(), String> {
         }
     }
 
-    let mut database = Database::new("database/".to_string());    
+    let mut database = Database::new("/usr/share/tab-cultist/database".to_string());    
 
     // album.index = (album.index + 1) % album.songs.len();
     let mut song = Song::new();

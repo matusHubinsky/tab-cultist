@@ -239,7 +239,9 @@ impl Database {
     }
 
     pub fn next(database: &mut Database) -> String { 
-        database.index = (database.index + 1) % database.files.len(); 
+        if database.files.len() != 0 {
+            database.index = (database.index + 1) % database.files.len(); 
+        }
         return database.files[database.index].clone();
     }
 

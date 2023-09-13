@@ -2,7 +2,7 @@
 
 // TODO: not tested yet
 
-
+use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead, Read};
 use std::path::Path;
@@ -59,10 +59,21 @@ impl Settings {
         }
     }
 
-    pub fn load() -> io::Result<Settings> {
-        let file = File::open("./config.txt")?;
-        let reader = io::BufReader::new(file);
+    pub fn load() -> io::Result<Settings> { 
+        let file;
 
+        // find the config.txt
+        match fs::metadata("./config.txt") {
+            Ok(_) => {
+                file = File::open("/usr/share/tab-cultist/config.txt")?;
+            }
+            Err(_) => {
+                file = File::open("./config.txt")?;
+
+            }
+        }
+
+        let reader = io::BufReader::new(file);
         let mut settings = Settings::new();
 
         for line_res in reader.lines() {
