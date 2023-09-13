@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=tab-cultist
+Exec=/usr/bin/./tab-cultist
+Icon=/usr/share/tab-cultist/icon.png
+Type=Application
+Categories=Utility
