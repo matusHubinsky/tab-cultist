@@ -1,6 +1,6 @@
 [package]
 name = "tab-cultist"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 license = "GPL-3.0-only"
 
@@ -8,7 +8,9 @@ license = "GPL-3.0-only"
 
 [dependencies]
 json = "0.12.4"
+winres = "0.1.12"
 
 [dependencies.sdl2]
-version = "0.35.2"
+version =  "0.35.2"
 features = ["image","ttf"]
+

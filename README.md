@@ -6,10 +6,14 @@ TabCultist is an application written in Rust for displaying guitar or bass tabs.
 - **previous song**: down arrow
 
 # Instalation
-
 ## Linux and MacOS
+1. Download `tab-cultist-linux.zip`
+2. Unzip 
+3. Run `sudo bash install.sh`
 
-## Dependencies
+# Development
+## Linux and MacOS
+### Dependencies
 Install sdl2 library:
 
 Arch/Manjaro linux
@@ -19,7 +23,7 @@ sudo pacman -S sdl2 sdl2_ttf sdl2_image
 
 Ubuntu/Debian/Kali
 ```
-sudo apt install sdl2 sdl2_ttf sdl2_image
+sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
 ```
 
 ### Instalation unsing **install.sh**:
@@ -42,6 +46,32 @@ mv target/release/./tab-cultist /usr/bin/
 ```
 
 # Examples
+
+# Settings
+The settings can be changed by editing the `config.txt`
+Default settings:
+```
+[general]
+name = tab-cultist
+version = 0.1.0
+
+[window]
+title = tab-cultist
+width = 1920
+height = 1080
+fullscreen = false
+
+[theme]
+font = Roboto_Mono
+font_location = ./font/Roboto_Mono/RobotoMono-VariableFont_wght.ttf"
+font_small_size = 12
+font_medium_size = 32
+font_big_size = 128
+
+[song]
+lines = 8
+note_size = 2
+```
 
 # TODO
 - automatic calculating lines and displaying tabs
