@@ -6,6 +6,7 @@ use std::path::Path;
 
 use crate::Settings;
 
+const RUNNER_X_INIT: i32 = 163;
 
 pub struct Window {
     pub width: u32,
@@ -32,6 +33,7 @@ impl Window {
 pub struct Tabs {
     pub tones: [String; 6],
     pub notes: String,
+    pub lenght: usize,
 }
 
 
@@ -47,6 +49,7 @@ impl Tabs {
                 String::new(),
             ],
             notes: String::new(),
+            lenght: 0,
         }
     }
 }
@@ -97,19 +100,23 @@ impl Song {
     
         // Iterate over the tabs
         let tabs = &json_data["tabs"];
-        if tabs.is_array() {
-            let mut i = 0;
-            let mut tab = Tabs::new();
-            for json_tab in tabs.members() {
-                if i == tabs.len() - 1 {
-                    tab.notes = json_tab.to_string().replace("\"", "");
-                } else {
-                    tab.tones[i] = json_tab.to_string().replace("\"", "");
-                }
-                i += 1;
-            }
-            song.tabs = tab;
+
+        if !tabs.is_array() {
+            return Err(("load song: tab is not array").to_string());
         }
+
+        let mut i = 0;
+        let mut tab = Tabs::new();
+        for json_tab in tabs.members() {
+            if i == tabs.len() - 1 {
+                tab.notes = json_tab.to_string().replace("\"", "");
+            } else {
+                tab.tones[i] = json_tab.to_string().replace("\"", "");
+            }
+            i += 1;
+        }
+        song.tabs.lenght = tab.notes.len();
+        song.tabs = tab;
 
         return Ok(());
     }
@@ -140,7 +147,7 @@ pub struct Album {
 
 
 impl Album {
-    pub fn new(path: String) -> Self {
+    pub fn new() -> Self {
         Self {
             // songs: Album::load(path),
             songs: Vec::<Song>::new(),
@@ -162,7 +169,7 @@ impl Album {
                             let mut song = Song::new();
                             Song::load(path.to_str().unwrap().to_string(), &mut song).unwrap();
                             songs.push(song);
-                            println!("{}", path.display());
+                            println!("  {}", path.display());
                         }
                     }
                 }
@@ -216,25 +223,24 @@ impl Database {
         
         let database = Path::new(path.as_str());
 
-        if database.is_dir() {
-            if let Ok(entries) = fs::read_dir(database) {
-                println!("Files:");
-                for entry in entries {
-                    if let Ok(entry) = entry {
-                        let path = entry.path();
-                        if path.is_file() {
-                            files.push(path.display().to_string());
-                            println!("{}", path.display());
-                        }
-                    }
-                }
-            } else {
-                println!("Failed to read directory");
-            }
-        } else {
-            println!("Specified path is not a directory");
+        if !database.is_dir() {
+            println!("Specified path is not a directory: '{}' ", path.as_str());
         }
 
+        if let Ok(entries) = fs::read_dir(database) { 
+            println!("Files:");
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    let path = entry.path();
+                    if path.is_file() {
+                        files.push(path.display().to_string());
+                        println!("  {}", path.display());
+                    }
+                }
+            }
+        } else {
+            println!("Failed to read directory");
+        } 
         return files;
     }
 
@@ -266,16 +272,15 @@ pub struct Runner {
 impl Runner {
     pub fn new() -> Self {
         Self {
-            x: 60,
+            x: RUNNER_X_INIT,
             y: 80,
             play: false,
             show: false,
         }
     }
 
-
     pub fn play(mut self, song: &mut Song, window: &mut Window, i: usize) -> Self {
-        let shift = 24;
+        let shift = 27;
     
         match song.tabs.notes.chars().nth(i) {
             None => self.play = false,
@@ -285,12 +290,13 @@ impl Runner {
             Some('8') => self.x += shift / 8,
             Some('9') => self.x += shift / 16,
             Some('|') => self.x += 0,
+            Some(':') => self.x = RUNNER_X_INIT,
             _ => println!("Error: Wrong value {} at Song tabs!", song.tabs.notes.chars().nth(i).unwrap()),
         }
 
         if self.x > window.width as i32 { 
             self.y += 175;
-            self.x = 60;
+            self.x = RUNNER_X_INIT;
         }
         
         return self;

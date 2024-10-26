@@ -1,27 +1,19 @@
 
 
 // TODO: not tested yet
+// TODO: not working YET
 
 use std::fs;
 use std::fs::File;
-use std::io::{self, BufRead, Read};
-use std::path::Path;
+use std::io::{self, BufRead, };
 
 
 fn string_to_bool(condition: &str) -> Result<bool, &'static str> {
-    println!("Here: {}", condition);
     match condition {
         "true" | "t" => Ok(true),
         "false" | "f" => Ok(false),
         _ => Err("Unknown boolean type: {}",),
     }
-}
-
-
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    return Ok(io::BufReader::new(file).lines())
 }
 
 
@@ -65,11 +57,10 @@ impl Settings {
         // find the config.txt
         match fs::metadata("./config.txt") {
             Ok(_) => {
-                file = File::open("/usr/share/tab-cultist/config.txt")?;
+                file = File::open("./config.txt")?;
             }
             Err(_) => {
-                file = File::open("./config.txt")?;
-
+                file = File::open("/usr/share/tab-cultist/config.txt")?;
             }
         }
 
@@ -95,8 +86,16 @@ impl Settings {
                     "font_big_size" => settings.font_big_size =words[2].parse::<u32>().unwrap(),
                     "lines" => settings.lines =words[2].parse::<u32>().unwrap(),
                     "note_size" => settings.note_size =words[2].parse::<u32>().unwrap(),
+                    "next_song" => continue,
+                    "previous_song" => continue,
+                    "toggle_fullscreen" => continue,
+                    "close" => continue,
+                    "render_scale_quality" => continue,
+                    "logo" => continue,
+                    "icon" => continue,
+                    "database" => continue,
                     " " => continue,
-                    _ => println!("Error: {}", words[2]),
+                    _ => println!("Err: {}: {}", words[0], words[2]),
                 }
             } 
         }
