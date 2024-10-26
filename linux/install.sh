@@ -22,6 +22,7 @@ mkdir /usr/share/tab-cultist/font
 
 echo "Moving tab-cultist database and modules to /usr/share/tab-cultist"
 cp linux/./icon.png /usr/share/tab-cultist/
+cp linux/./logo_screen.png /usr/share/tab-cultist/
 cp linux/./tab-cultist.desktop /usr/share/tab-cultist/
 cp ./config.txt  /usr/share/tab-cultist/
 cp font/ -r /usr/share/tab-cultist/

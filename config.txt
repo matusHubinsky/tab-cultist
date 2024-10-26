@@ -1,7 +1,6 @@
 
 [general]
 name = "tab-cultist"
-version = 1.0.0
 
 [window]
 title = "tab-cultist"
@@ -10,11 +9,11 @@ height = 1080
 fullscreen = false
 
 [theme]
-font = Roboto_Mono
-location = /usr/share/tab-cultist/font/Roboto_Mono/./RobotoMono-VariableFont_wght.ttf
+font = Arimo-Regular
+location = /usr/share/tab-cultist/font/Arimo-Regular.ttf
 font_small_size = 12
 font_medium_size = 32
-font_big_size = 128
+font_big_size = 86
 
 [song]
 lines = 8
@@ -27,7 +26,7 @@ toggle_fullscreen = "f"
 close = "esc"
 
 [sdl2]
-render_scale_quality = 1
+render_scale_quality = 2
 
 [linux]
 logo = /usr/share/tab-cultist/

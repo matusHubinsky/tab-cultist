@@ -1,4 +1,14 @@
-# tab-cultist
+```
+-------------------------------------------------------------------------------
+  _______    _        _____      _ _   _     _   
+ |__   __|  | |      / ____|    | | | (_)   | |  
+    | | __ _| |__   | |    _   _| | |_ _ ___| |_ 
+    | |/ _` | '_ \  | |   | | | | | __| / __| __|
+    | | (_| | |_) | | |___| |_| | | |_| \__ \ |_ 
+    |_|\__,_|_.__/   \_____\__,_|_|\__|_|___/\__|
+-------------------------------------------------------------------------------
+```
+
 TabCultist is an application written in Rust for displaying guitar or bass tabs. 
 
 # Usage
@@ -9,7 +19,7 @@ TabCultist is an application written in Rust for displaying guitar or bass tabs.
 ## Linux and MacOS
 1. Download `tab-cultist-linux.zip`
 2. Unzip 
-3. Run `sudo bash install.sh`
+3. Run 'bash install.sh`
 
 # Development
 ## Linux and MacOS
@@ -40,6 +50,7 @@ chmod +x install.sh
 ```
 git clone https://github.com/matusHubinsky/tab-cultist
 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+cd tab-cultist
 cargo build --release
 cargo run --release
 mv target/release/./tab-cultist /usr/bin/
