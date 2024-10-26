@@ -56,6 +56,8 @@ mv target/release/./tab-cultist /usr/bin/
 
 # Examples
 
+![alt text](image.png)
+
 # Settings
 The settings can be changed by editing the `config.txt`
 Default settings:
