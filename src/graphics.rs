@@ -5,13 +5,18 @@ use sdl2::rect::Point;
 use sdl2::render::{WindowCanvas, TextureCreator};
 use sdl2::video::WindowContext;
 
+use sdl2::image::LoadTexture;
+
 use crate::texture::TextureManager;
 
 use crate::data::Song;
 use crate::data::Runner;
 use crate::data::Window;
 
+use crate::Duration;
+
 const BEGIN_X_SHIFT: i32 = 64;
+const BEGIN_Y_SHIFT: i32 = 32;
 const X_SHIFT: i32 = 15;
 const LINES_SPACING: i32 = 17;
 
@@ -34,7 +39,7 @@ fn render_text(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<Windo
 
 
 pub fn render_lines(song: &mut Song, canvas: &mut WindowCanvas, window: &mut Window) -> Result<(), String> {
-    let mut shift = 80;
+    let mut shift = 80 + BEGIN_Y_SHIFT;
     let line_number = 6; 
     let line_lenght = (song.tabs.notes.len() / 64) + 2;
 
@@ -47,6 +52,52 @@ pub fn render_lines(song: &mut Song, canvas: &mut WindowCanvas, window: &mut Win
         shift += 175;
     }
     
+    return Ok(());
+}
+
+
+pub fn render_logo(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowContext>, font_big: &sdl2::ttf::Font, window: &mut Window) -> Result<(), String>  {
+    let logo = texture_creator
+        .load_texture("linux/logo_screen.png")
+        .map_err(|e| e.to_string())?;    
+
+    let text_surface = font_big
+        .render("Atush Software")
+        .blended(Color::RGB(0xff, 0xff, 0xff))  // Text color
+        .map_err(|e| e.to_string())?;
+    let text_texture = texture_creator
+        .create_texture_from_surface(&text_surface)
+        .map_err(|e| e.to_string())?;
+
+    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+
+    let x: i32 = (window.width/2-256-64).try_into().unwrap();
+    let y: i32 = (window.height/6).try_into().unwrap();
+    let w: u32 = ("Atush Software".len() * 48).try_into().unwrap();
+    
+    for i in (0..=0xff).step_by(4) {
+        canvas.clear();
+        canvas.copy(&logo, None, Rect::new(0, 0, window.width, window.height))?; 
+        canvas.copy(&text_texture, None, Rect::new(x, y, w, 104))?;
+        canvas.set_draw_color(Color::RGBA(0, 0, 0, 255 - i));
+        canvas.fill_rect(Rect::new(0, 0, window.width, window.height))?;
+        canvas.present();
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+
+    std::thread::sleep(std::time::Duration::from_secs(1));
+
+    for i in (0..=0xff).step_by(4) {
+        canvas.clear();
+        canvas.copy(&logo, None, Rect::new(0, 0, window.width, window.height))?; 
+        canvas.copy(&text_texture, None, Rect::new(x, y, w, 104))?;
+        canvas.set_draw_color(Color::RGBA(0, 0, 0, 0 + i));
+        canvas.fill_rect(Rect::new(0, 0, window.width, window.height))?;
+        canvas.present();
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+
+    canvas.clear();
     return Ok(());
 }
 
@@ -65,7 +116,8 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
 
     // Artist and song Title
     let name = format!("{} - {}", song.artist, song.title);
-    render_text(canvas, &texture_creator, &font_big, name, window.width as i32 / 2 - 200, 5, 400, 48)?;
+    let width = (name.len()*24).try_into().unwrap();
+    render_text(canvas, &texture_creator, &font_big, name.clone(), window.width as i32 / 2 - ((width/2) as i32), 32, width, 48)?;
 
     let mut letter = String::new();
 
@@ -96,8 +148,8 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
             .blended(Color::RGBA(255, 255, 255, 255))
             .map_err(|e| e.to_string())?;
         let texture = texture_creator
-                .create_texture_from_surface(&surface)
-                .map_err(|e| e.to_string())?;    
+            .create_texture_from_surface(&surface)
+            .map_err(|e| e.to_string())?;    
         textures_notes.push(texture);
     }
 
@@ -131,13 +183,12 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
     let mut i = 0;
     let mut skip: u32 = 0;
     let default_x = 53 + BEGIN_X_SHIFT;
-    let default_y = 70;
+    let default_y = 70 + BEGIN_Y_SHIFT;
     let mut note_x = 63 + BEGIN_X_SHIFT;
-    let mut note_y = 70; 
+    let mut note_y = 70 + BEGIN_Y_SHIFT; 
 
     for line in song.tabs.tones.iter() {
         let mut j = 0;
-        let mut tab_index: usize = 0;
         let mut dont = false;
         for c in line.chars() {
 
@@ -162,14 +213,6 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
             // rendering tabs
             if let Some(number) = c.to_digit(10) {
                 let mut k: usize = number.try_into().unwrap();
-                
-                // check if next character is a number too and not a '-'
-                if let Some(number) = line.chars().nth(tab_index).unwrap().to_digit(10) {
-                    let tmp: usize = number.try_into().unwrap();
-                    k += tmp;
-                    tab_index += 1;
-                    skip = 2;
-                }
 
                 if !dont || skip > 0 {
                     canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
@@ -179,6 +222,7 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
                 
                 if k > 10 {
                     canvas.copy(&textures_notes[k], None, Rect::new(note_x, note_y, 16, 20))?; 
+                    println!("Double: {:?}", k);
                 } else {
                     canvas.copy(&textures_notes[k], None, Rect::new(note_x, note_y, 10, 20))?; 
                 }
@@ -188,8 +232,6 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
                         dont = true;
                     } 
                 }
-
-                tab_index += 1;
             } 
 
             // rendering bar lines
@@ -223,14 +265,14 @@ pub fn render(canvas: &mut WindowCanvas, _tex_man: &mut TextureManager<WindowCon
     for c in song.tuning.chars() {
         let ordinal = c as usize;
         canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
-        canvas.fill_rect(Rect::new(BEGIN_X_SHIFT+3, 73 + i*LINES_SPACING, 12, 8))?;  
-        canvas.copy(&textures_chars[ordinal], None, Some(Rect::new(BEGIN_X_SHIFT+5, 70 + i*LINES_SPACING, 10, 20)))?;
+        canvas.fill_rect(Rect::new(BEGIN_X_SHIFT+3, BEGIN_Y_SHIFT+73 + i*LINES_SPACING, 12, 8))?;  
+        canvas.copy(&textures_chars[ordinal], None, Some(Rect::new(BEGIN_X_SHIFT+5, BEGIN_Y_SHIFT+70 + i*LINES_SPACING, 10, 20)))?;
         i += 1;
     }
 
     // draw tempo notes
-    canvas.copy(&textures_tempo[first], None, Some(Rect::new(BEGIN_X_SHIFT+30, 80, 25, 50)))?;  
-    canvas.copy(&textures_tempo[second], None, Some(Rect::new(BEGIN_X_SHIFT+30,115, 25, 50)))?;  
+    canvas.copy(&textures_tempo[first], None, Some(Rect::new(BEGIN_X_SHIFT+30, 80+BEGIN_Y_SHIFT, 25, 50)))?;  
+    canvas.copy(&textures_tempo[second], None, Some(Rect::new(BEGIN_X_SHIFT+30,115+BEGIN_Y_SHIFT, 25, 50)))?;  
 
     // render runner
     if runner.show {

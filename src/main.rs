@@ -91,6 +91,10 @@ fn main() -> Result<(), String> {
     let mut runner = Runner::new();
     let mut i = 0;
 
+    sdl2::hint::set("SDL_RENDER_SCALE_QUALITY", "0");
+    graphics::render_logo(&mut canvas, &texture_creator, &font_big, &mut window)?;
+    sdl2::hint::set("SDL_RENDER_SCALE_QUALITY", "2");
+
     // Main event loop
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
